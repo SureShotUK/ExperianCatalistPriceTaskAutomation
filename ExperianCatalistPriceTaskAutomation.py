@@ -23,7 +23,7 @@ def downloadAttachment():
         print("Experian Catalist Price Averages email cannot be found.")    
 
 #file downloader and puts into the cwd - must go before path declarations
-downloadAttachment()    
+#downloadAttachment()    
 shareDrivePath = "//LS-WTGL03A//share//MV"
 worksheet1 = cwd + "\\ExperianDailyAverage.xlsx"
 worksheet2 = shareDrivePath + "//Pump Prices vs Platts.xlsx"
@@ -50,6 +50,8 @@ def deleteEmptyRowsInCertainSheet(worksheet):
 #function that moves selected rows from one sheet to another
 def rowMover(worksheet1, worksheet2):
     import openpyxl
+    import datetime
+    print("Beginning to move data from downloaded Excel sheet to existing Excel sheet.")
     book1 = openpyxl.load_workbook(worksheet1)
     sheet1 = book1.active
     book2 = openpyxl.load_workbook(worksheet2)
@@ -57,7 +59,11 @@ def rowMover(worksheet1, worksheet2):
     #data comes in 3 rows, first row being header, so must copy over 2nd and 3rd row, but must validate that they do not exist already.
     #sometimes experian sends the same day's data twice.
 
-    if sheet1['A2'].value == sheet2['A' + str(sheet2.max_row-1)].value or sheet1['A2'].value == sheet2['A' + str(sheet2.max_row)].value:
+    #must first format experian data to be in datetime format as we cannot compare the dates already in excel to the ones sent by experian
+    sheet1_a2Raw = sheet1["A2"].value
+    sheet1_a2Formatted = datetime.datetime.strptime(sheet1_a2Raw, "%d/%m/%Y")
+
+    if sheet1_a2Formatted == sheet2['A' + str(sheet2.max_row-1)].value or sheet1_a2Formatted == sheet2['A' + str(sheet2.max_row)].value:
         print("Experian Catalist Price Averages for day " + sheet1['A2'].value + " already exists in destination sheet.")
     else:
         sheet1Row2 = sheet1.iter_rows(min_row=2, max_row=2, min_col=1, max_col=sheet1.max_column, values_only=True)
@@ -66,7 +72,10 @@ def rowMover(worksheet1, worksheet2):
             book2.save(worksheet2)
         print("Added Experian Catalist Price Averages for day " + sheet1['A2'].value + " to " + worksheet2)
 
-    if sheet1['A3'].value == sheet2['A' + str(sheet2.max_row-1)].value or sheet1['A3'].value == sheet2['A' + str(sheet2.max_row)].value:
+    sheet1_a3Raw = sheet1["A3"].value
+    sheet1_a3Formatted = datetime.datetime.strptime(sheet1_a3Raw, "%d/%m/%Y")
+
+    if sheet1_a3Formatted == sheet2['A' + str(sheet2.max_row-1)].value or sheet1_a3Formatted == sheet2['A' + str(sheet2.max_row)].value:
         print("Experian Catalist Price Averages for day " + sheet1['A3'].value + " already exists in destination sheet.")
     else:
         sheet1Row3 = sheet1.iter_rows(min_row=3, max_row=sheet1.max_row, min_col=1, max_col=sheet1.max_column, values_only=True)
@@ -78,14 +87,33 @@ def rowMover(worksheet1, worksheet2):
 #function for formatting the new cells to be in correct format(date/number/alignment)
 def cellFormatting(worksheet):
     import openpyxl
+    import datetime
+    print("Beginning formatting newly entered cells to work in formulas on other sheets.")
     book = openpyxl.load_workbook(worksheet)
     sheet = book["Imports"]
     maxrow = sheet.max_row
 
     #formatting for date cells
-    for c in sheet['A' + str(maxrow -1):'A' + str(maxrow)]:
-        c[0].number_format = 'dd/mm/yyyy'
-        c[0].alignment = openpyxl.styles.Alignment(horizontal='right', vertical='bottom')
+    def excelDateToNumber(worksheet, cell):
+        try:
+            dateText = sheet[cell].value
+            #print(sheet[cell].value)
+            #print(dateText)
+            #convert dateText to datetime object
+            date = datetime.datetime.strptime(dateText, "%d/%m/%Y")
+            #print(date)
+            sheet[cell].value = date
+            sheet[cell].number_format = 'dd/mm/yyyy'
+            #print(sheet[cell].value)
+            print(cell + " converted to datetime format")
+            
+        except:
+            print(cell + " is already in datetime format")
+        book.save(worksheet)
+
+    excelDateToNumber(worksheet, "A" + str(maxrow-1))
+    excelDateToNumber(worksheet, "A" + str(maxrow))
+
     
     #formatting for number cells in first row of newly inputted data
     for c in sheet.iter_cols(min_row=maxrow-1, max_row=maxrow, min_col=2, max_col=5):
