@@ -1,2 +1,2 @@
 # ExperianCatalistPriceTaskAutomation
-A python program to download an excel attachment of daily prices and copies the rows of data to a local excel file that stores previous dates. Includes validation to make sure dates are not duplicated, deleting empty rows, and cell formatting and validation. 
+This is a simple python program that automates a daily excel task involving downloading an excel attachment from Experian and copying the data to a local excel file. The program also includes validation to make sure dates are not duplicated, deleting empty rows, and cell formatting and validation.
