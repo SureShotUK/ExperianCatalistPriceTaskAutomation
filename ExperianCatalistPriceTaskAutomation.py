@@ -23,7 +23,7 @@ def downloadAttachment():
         print("Experian Catalist Price Averages email cannot be found.")    
 
 #file downloader and puts into the cwd - must go before path declarations
-#downloadAttachment()    
+downloadAttachment()    
 shareDrivePath = "//LS-WTGL03A//share//MV"
 worksheet1 = cwd + "\\ExperianDailyAverage.xlsx"
 worksheet2 = shareDrivePath + "//Pump Prices vs Platts.xlsx"
