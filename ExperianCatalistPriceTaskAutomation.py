@@ -24,7 +24,7 @@ def downloadAttachment():
 
 #file downloader and puts into the cwd - must go before path declarations
 downloadAttachment()    
-shareDrivePath = "//LS-WTGL03A//share//MV"
+shareDrivePath = "//LS-WTGL03A//share//Prices"
 worksheet1 = cwd + "\\ExperianDailyAverage.xlsx"
 worksheet2 = shareDrivePath + "//Pump Prices vs Platts.xlsx"
 
