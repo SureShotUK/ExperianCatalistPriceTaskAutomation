@@ -19,11 +19,14 @@ def downloadAttachment():
 
     if confirmation() == True:
         print("Email found and attachment downloaded to " + cwd)
+        return True
     else:
-        print("Experian Catalist Price Averages email cannot be found.")    
+        print("Experian Catalist Price Averages email for todays date cannot be found.")
+        emailNotifications("Failure", "Experian Catalist Price Averages email for todays date cannot be found.")
+        return False    
 
 #file downloader and puts into the cwd - must go before path declarations
-downloadAttachment()    
+#downloadAttachment()    
 shareDrivePath = "//LS-WTGL03A//share//Prices"
 worksheet1 = cwd + "\\ExperianDailyAverage.xlsx"
 worksheet2 = shareDrivePath + "//Pump Prices vs Platts.xlsx"
@@ -126,6 +129,17 @@ def cellFormatting(worksheet):
     book.save(worksheet)
     print("Cell formatting complete to match destination.")
 
+#email notifications
+def emailNotifications(outcome, message):
+    import win32com.client
+    outlook = win32com.client.Dispatch("Outlook.Application")
+    mail = outlook.CreateItem(0)
+    #mail.To = "it@portland-fuel.co.uk"
+    mail.To = "miles@portland-fuel.co.uk"
+    mail.Subject = outcome + ': Experian Catalist Price Task Automation'
+    mail.Body = "Experian Catalist Price Task Automation has run with the following outcome: " + message
+    mail.Send()
+
 #function to make sure downloaded data is in expected format, if not, program will not run
 def experianCatalistPriceTaskAutomation(worksheet1, worksheet2):
     import openpyxl
@@ -140,7 +154,17 @@ def experianCatalistPriceTaskAutomation(worksheet1, worksheet2):
         rowMover(worksheet1, worksheet2)
         cellFormatting(worksheet2)
         print("Program has completed.")
+        emailNotifications("Success", "Program has completed successfully.")
     else:
         print("Downloaded data is not in expected format, program will not run.")
+        emailNotifications("Failure", "Data is not in expected format, program will not run.")
 
-experianCatalistPriceTaskAutomation(worksheet1, worksheet2)
+
+if downloadAttachment() == True:
+    experianCatalistPriceTaskAutomation(worksheet1, worksheet2)
+else:
+    print("Download did not complete successfully, program will not run.")
+
+
+
+
