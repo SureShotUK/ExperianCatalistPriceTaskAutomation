@@ -26,10 +26,11 @@ def downloadAttachment():
         return False    
 
 #file downloader and puts into the cwd - must go before path declarations
-#downloadAttachment()    
-shareDrivePath = "//LS-WTGL03A//share//Prices"
+#downloadAttachment() 
+username = os.getlogin()   
+shareDrivePath = f"C:\\Users\\{username}\\OneDrive - Fuel Trading Company\\Portland\\Prices"
 worksheet1 = cwd + "\\ExperianDailyAverage.xlsx"
-worksheet2 = shareDrivePath + "//Pump Prices vs Platts.xlsx"
+worksheet2 = shareDrivePath + "\\Pump Prices vs Platts.xlsx"
 
 #function to delete empty rows in specified sheet
 def deleteEmptyRowsInCertainSheet(worksheet):
@@ -134,8 +135,8 @@ def emailNotifications(outcome, message):
     import win32com.client
     outlook = win32com.client.Dispatch("Outlook.Application")
     mail = outlook.CreateItem(0)
-    #mail.To = "it@portland-fuel.co.uk"
-    mail.To = "miles@portland-fuel.co.uk"
+    mail.To = "it@portland-fuel.co.uk"
+    # mail.To = "miles@portland-fuel.co.uk"
     mail.Subject = outcome + ': Experian Catalist Price Task Automation'
     mail.Body = "Experian Catalist Price Task Automation has run with the following outcome: " + message
     mail.Send()
